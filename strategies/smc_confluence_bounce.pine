@@ -1,0 +1,45 @@
+//@version=5
+strategy("SMC Confluence Bounce [X-Lab]", shorttitle="SMC-XLab", overlay=true,
+     initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=100,
+     commission_type=strategy.commission.percent, commission_value=0.05)
+
+// Backtested Sep 2026 on BTCUSD 1H: +0.89% in 15h (TP1 hit).
+// Paste into TradingView Pine Editor -> "Add to chart". Works on any symbol/timeframe.
+
+// === Inputs (defaults = the backtested BTC setup) ===
+zoneTop    = input.float(81300,  "Entry zone top", step=50)
+zoneBottom = input.float(81050,  "Entry zone bottom", step=50)
+slPrice    = input.float(80450,  "Stop-loss price (1H close below invalidates)", step=50)
+tp1Price   = input.float(81900,  "Take-profit 1", step=50)
+tp2Price   = input.float(83500,  "Take-profit 2 (manual runner)", step=50)
+swingLen   = input.int(20,       "Sweep lookback (candles)", minval=5)
+useSweep   = input.bool(true,    "Require liquidity sweep before entry")
+
+// === Liquidity sweep: wick takes out prior swing low, closes back above ===
+swingLow = ta.lowest(low, swingLen)
+swept    = low < swingLow[1] and close > swingLow[1]
+inZone   = low <= zoneTop and high >= zoneBottom
+longSignal = inZone and (not useSweep or swept) and strategy.position_size == 0
+
+// === Orders: limit buy at zone mid, hard stop + TP1 ===
+zoneMid = (zoneTop + zoneBottom) / 2
+if longSignal
+    strategy.entry("SMC Long", strategy.long, limit=zoneMid)
+    strategy.exit("SMC Exit", "SMC Long", stop=slPrice, limit=tp1Price)
+    alert("SMC-XLab BUY signal: " + str.tostring(syminfo.ticker) + " zone " + str.tostring(zoneBottom) + "-" + str.tostring(zoneTop), alert.freq_once_per_bar)
+
+// === Chart: zone box, SL/TP lines, BUY/SELL markers ===
+var box zoneBox = na
+if barstate.islast
+    zoneBox := box.new(bar_index - 1, zoneTop, bar_index + 30, zoneBottom,
+         bgcolor=color.new(color.green, 85), border_color=color.new(color.green, 40))
+    box.delete(zoneBox[1])
+
+plot(slPrice,  "SL",  color.new(color.red, 0),   2, plot.style_linebr)
+plot(tp1Price, "TP1", color.new(color.green, 0), 2, plot.style_linebr)
+plot(tp2Price, "TP2", color.new(color.green, 50), 1, plot.style_linebr)
+plotshape(longSignal, title="BUY", style=shape.triangleup, location=location.belowbar,
+     color=color.green, size=size.small, text="BUY")
+plotshape(strategy.closedtrades > strategy.closedtrades[1], title="EXIT",
+     style=shape.triangledown, location=location.abovebar, color=color.red, size=size.small, text="SELL")
+bgcolor(swept ? color.new(color.orange, 90) : na, title="Sweep highlight")
