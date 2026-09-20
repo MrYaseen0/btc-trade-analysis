@@ -1,0 +1,55 @@
+{
+ "s1": {
+  "trades": 10,
+  "win_rate": 20.0,
+  "total_return": -9.36,
+  "max_dd": -11.88,
+  "profit_factor": 0.46
+ },
+ "s2": {
+  "trades": 12,
+  "win_rate": 0.0,
+  "total_return": -29.34,
+  "max_dd": -25.46,
+  "profit_factor": 0.0
+ },
+ "s3": {
+  "trades": 1,
+  "win_rate": 100.0,
+  "total_return": 1.21,
+  "note": "spot leg Aug27->Sep19; options overlay needs Deribit IV",
+  "entry": 80278.98,
+  "exit": 81252.08
+ },
+ "s4": {
+  "trades": 0
+ },
+ "s5": {
+  "status": "TP1 HIT \u2014 trade closed WIN",
+  "entry": 81175,
+  "entry_time": "2026-09-19 00:00:00+00:00",
+  "exit": 81900,
+  "exit_time": "2026-09-19 15:00:00+00:00",
+  "pnl_pct": 0.89,
+  "note": "TP1 hit Sep 19 15:00 UTC, 15h after entry. Holding for TP2 would have STOPPED on Sep 20 (1H closes <80,450).",
+  "sl": 80450,
+  "tp1": 81900,
+  "tp2": 83500
+ },
+ "data": {
+  "daily_candles": 1000,
+  "from": "2023-12-26 00:00:00+00:00",
+  "to": "2026-09-20 00:00:00+00:00",
+  "last_close": 81252.08,
+  "last_fund7d": 6.877639596113334e-05,
+  "funding_records": 286
+ },
+ "signals": {
+  "s1_ict_sweep": "WAIT \u2014 no sweep setup on latest 4H candles",
+  "s2_78k_breakout": "LONG \u2014 entered Sep 18 close 80,879, price 81,252 (+0.46% open). Exit only on daily close <78,000",
+  "s3_call_spread": "HOLD \u2014 spot leg +1.21% into Sep 25 expiry; 85/95 spread needs BTC >85K+premium to profit",
+  "s4_funding": "NO SIGNAL \u2014 OKX 7d funding stayed positive all September; contrarian trigger never fired",
+  "s5_smc": "WAIT \u2014 TP1 banked. Re-enter only on fresh dip into 81,050\u201381,300 zone"
+ },
+ "winner": "s5_smc_confluence"
+}
